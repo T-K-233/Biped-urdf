@@ -1,0 +1,487 @@
+<?xml version="1.0" ?>
+<robot name="biped_v1" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Define intertial property macros  -->
+  <xacro:macro name="box_inertia" params="m w h d">
+    <inertial>
+      <origin xyz="0 0 0" rpy="${pi/2} 0 ${pi/2}"/>
+      <mass value="${m}"/>
+      <inertia ixx="${(m/12) * (h*h + d*d)}" ixy="0.0" ixz="0.0" iyy="${(m/12) * (w*w + d*d)}" iyz="0.0" izz="${(m/12) * (w*w + h*h)}"/>
+    </inertial>
+  </xacro:macro>
+
+  <xacro:macro name="motor_m6c12_visual">
+    <mesh filename="package://biped_v1/meshes/m6c12_visual.stl" scale="0.001 0.001 0.001"/>
+  </xacro:macro>
+  <xacro:macro name="motor_m6c12_collision">
+    <mesh filename="package://biped_v1/meshes/m6c12_visual.stl" scale="0.001 0.001 0.001"/>
+  </xacro:macro>
+  <xacro:macro name="motor_5010_visual">
+    <mesh filename="package://biped_v1/meshes/5010_visual.stl" scale="0.001 0.001 0.001"/>
+  </xacro:macro>
+  <xacro:macro name="motor_5010_collision">
+    <mesh filename="package://biped_v1/meshes/m6c12_collision.stl" scale="0.001 0.001 0.001"/>
+  </xacro:macro>
+
+  <xacro:macro name="hip_x" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 ${reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_m6c12_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_m6c12_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="${reflect*0.066} 0 0" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <limit upper="1.0472" lower="-1.0472" effort="10" velocity="5.0"/>
+      <axis xyz="1 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="hip_y" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="-1.5708 0 0"/>
+        <geometry>
+          <xacro:motor_m6c12_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="-1.5708 0 0"/>
+        <geometry>
+          <xacro:motor_m6c12_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="${reflect*0.054} 0 0" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <xacro:if value="${reflect == -1}">
+        <limit upper="1.0472" lower="-0.3491" effort="10" velocity="5.0"/>
+      </xacro:if>
+      <xacro:if value="${reflect == 1}">
+        <limit upper="0.3491" lower="-1.0472" effort="10" velocity="5.0"/>
+      </xacro:if>
+      <axis xyz="0 1 0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="hip_z" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+        <geometry>
+          <xacro:motor_m6c12_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+        <geometry>
+          <xacro:motor_m6c12_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="0 0 -0.140" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <limit upper="0.3491" lower="-0.3491" effort="10" velocity="5.0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="knee_x" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 ${reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_m6c12_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_m6c12_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="0 0 -0.240" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <limit upper="0.1745" lower="-2.3562" effort="10" velocity="5.0"/>
+      <axis xyz="1 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="knee_z" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+        <geometry>
+          <xacro:motor_5010_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+        <geometry>
+          <xacro:motor_5010_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="0 0 -0.138" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <limit upper="0.3491" lower="-0.3491" effort="10" velocity="5.0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="feet_x" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 ${-reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_5010_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${-reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_5010_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="0 0 -0.202" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <limit upper="1.0472" lower="-1.0472" effort="10" velocity="5.0"/>
+      <axis xyz="1 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="feet_y" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry>
+          <xacro:motor_5010_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+        <geometry>
+          <xacro:motor_5010_collision/>
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="0 -0.050 -0.060" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://biped_v1/meshes/shoe_collision.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 -0.050 -0.060" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://biped_v1/meshes/shoe_collision.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="0 0.050 -0.040" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <xacro:if value="${reflect == -1}">
+        <limit upper="0.3491" lower="-0.3491" effort="10" velocity="5.0"/>
+      </xacro:if>
+      <xacro:if value="${reflect == 1}">
+        <limit upper="0.3491" lower="-0.3491" effort="10" velocity="5.0"/>
+      </xacro:if>
+      <axis xyz="0 1 0"/>
+    </joint>
+  </xacro:macro>
+
+
+
+
+
+  <xacro:macro name="shoulder_x" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 ${reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_m6c12_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_m6c12_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="${reflect*0.124} 0 0.420" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <limit upper="1.0472" lower="-1.0472" effort="10" velocity="5.0"/>
+      <axis xyz="1 0 0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="shoulder_y" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="-1.5708 0 0"/>
+        <geometry>
+          <xacro:motor_5010_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="-1.5708 0 0"/>
+        <geometry>
+          <xacro:motor_5010_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="${reflect*0.046} 0 0" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <xacro:if value="${reflect == -1}">
+        <limit upper="1.0472" lower="-0.0" effort="10" velocity="5.0"/>
+      </xacro:if>
+      <xacro:if value="${reflect == 1}">
+        <limit upper="0.0" lower="-1.0472" effort="10" velocity="5.0"/>
+      </xacro:if>
+      <axis xyz="0 1 0"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="shoulder_z" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+        <geometry>
+          <xacro:motor_5010_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="3.1415 0 0"/>
+        <geometry>
+          <xacro:motor_5010_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="0 0 -0.123" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <limit upper="0.3491" lower="-0.3491" effort="10" velocity="5.0"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+  </xacro:macro>
+
+  <xacro:macro name="elbow_x" params="prefix reflect parent">
+    <link name="${prefix}_link">
+      <inertial>
+        <mass value="0.2"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="2.324E-4" ixy="0.00" ixz="0.00" iyy="2.324E-4" iyz="0.00" izz="1.249E-4"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 ${-reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_5010_visual/>
+        </geometry>
+        <material name="White">
+          <color rgba="1.0 1.0 1.0 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="0 ${-reflect*1.5708} 0"/>
+        <geometry>
+          <xacro:motor_5010_collision/>
+        </geometry>
+      </collision>
+    </link>
+    <joint name="${prefix}_joint" type="revolute">
+      <parent link="${parent}_link"/>
+      <child link="${prefix}_link"/>
+      <origin xyz="0 0 -0.152" rpy="0 0 0"/>
+      <dynamics damping="0.01" friction="0.1"/>
+      <limit upper="2.3562" lower="-0.1745" effort="10" velocity="5.0"/>
+      <axis xyz="1 0 0"/>
+    </joint>
+  </xacro:macro>
+
+
+  
+
+  <link name="base_link">
+    <inertial>
+      <mass value="1"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.177" ixy="0.00" ixz="0.00" iyy="0.177" iyz="0.01" izz="0.001"/>
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://biped_v1/meshes/base_collision.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <material name="White">
+        <color rgba="1.0 1.0 1.0 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://biped_v1/meshes/base_collision.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+    <xacro:box_inertia m="40.0" w="1" d="1" h="1"/>
+  </link>
+  
+  <gazebo reference="base_link">
+    <material>Gazebo/Red</material>
+  </gazebo>
+
+  <xacro:hip_x prefix="hip_x_l" reflect="-1" parent="base"/>
+  <xacro:hip_x prefix="hip_x_r" reflect="1" parent="base"/>
+
+  <xacro:hip_y prefix="hip_y_l" reflect="-1" parent="hip_x_l"/>
+  <xacro:hip_y prefix="hip_y_r" reflect="1" parent="hip_x_r"/>
+
+  <xacro:hip_z prefix="hip_z_l" reflect="-1" parent="hip_y_l"/>
+  <xacro:hip_z prefix="hip_z_r" reflect="1" parent="hip_y_r"/>
+
+  <xacro:knee_x prefix="knee_x_l" reflect="-1" parent="hip_z_l"/>
+  <xacro:knee_x prefix="knee_x_r" reflect="1" parent="hip_z_r"/>
+
+  <xacro:knee_z prefix="knee_z_l" reflect="-1" parent="knee_x_l"/>
+  <xacro:knee_z prefix="knee_z_r" reflect="1" parent="knee_x_r"/>
+
+  <xacro:feet_x prefix="feet_x_l" reflect="-1" parent="knee_z_l"/>
+  <xacro:feet_x prefix="feet_x_r" reflect="1" parent="knee_z_r"/>
+
+  <xacro:feet_y prefix="feet_y_l" reflect="-1" parent="feet_x_l"/>
+  <xacro:feet_y prefix="feet_y_r" reflect="1" parent="feet_x_r"/>
+
+  <xacro:shoulder_x prefix="shoulder_x_l" reflect="-1" parent="base"/>
+  <xacro:shoulder_x prefix="shoulder_x_r" reflect="1" parent="base"/>
+
+  <xacro:shoulder_y prefix="shoulder_y_l" reflect="-1" parent="shoulder_x_l"/>
+  <xacro:shoulder_y prefix="shoulder_y_r" reflect="1" parent="shoulder_x_r"/>
+
+  <xacro:shoulder_z prefix="shoulder_z_l" reflect="-1" parent="shoulder_y_l"/>
+  <xacro:shoulder_z prefix="shoulder_z_r" reflect="1" parent="shoulder_y_r"/>
+
+  <xacro:elbow_x prefix="elbow_x_l" reflect="-1" parent="shoulder_z_l"/>
+  <xacro:elbow_x prefix="elbow_x_r" reflect="1" parent="shoulder_z_r"/>
+  
+</robot>
